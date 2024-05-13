@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"stdio.h": "c",
+			"cli_interface.h": "c",
+			"cmsis_os.h": "c"
+		}
+	}
+}
