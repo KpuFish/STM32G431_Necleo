@@ -17,6 +17,7 @@ RM := rm -rf
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
 -include CLI/subdir.mk
+-include Boot/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -57,6 +58,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 stm32g431_nucleo_test.list \
 
+OBJCOPY_BIN += \
+stm32g431_nucleo_test.bin \
+
 
 # All Target
 all: main-build
@@ -80,12 +84,17 @@ stm32g431_nucleo_test.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL
 	@echo 'Finished building: $@'
 	@echo ' '
 
+stm32g431_nucleo_test.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "stm32g431_nucleo_test.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) default.size.stdout stm32g431_nucleo_test.elf stm32g431_nucleo_test.list stm32g431_nucleo_test.map
+	-$(RM) default.size.stdout stm32g431_nucleo_test.bin stm32g431_nucleo_test.elf stm32g431_nucleo_test.list stm32g431_nucleo_test.map
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

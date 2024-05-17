@@ -1,7 +1,18 @@
 
 #include "usart.h"
 #include "cli_interface.h"
+#include "flash_if.h"
+#include "xmodem.h"
+#include "ymodem.h"
+#include "menu.h"
 
+
+
+//----------------------------------------
+// CHECK . . .
+//----------------------------------------
+
+#define BOOT_MODE	0
 
 
 //----------------------------------------
@@ -50,7 +61,9 @@ const CMD_LIST cmd_list[] =
     {"X"            , cbf_xmodem           , "F/W Download"                     },
     {"DUMP"         , cbf_dump             , "Dump Memory"                      },
     {"FLASH_TEST"   , cbf_flash_test       , "Test Flash WR"                    },
-    //{"JUMP"         , cbf_app_fw_jump      , "Jump from Bootloader to Main App" },
+#if BOOT_MODE
+    {"JUMP"         , cbf_app_fw_jump      , "Jump from Bootloader to Main App" },
+#endif
     {"TAG"          , cbf_tag              , "Check Tag Info"                   },
     {"ASSERT"       , cbf_test_assert      , "Test Assert"                      },
     {"EVENT?"       , cbf_event_print      , "Print Event Log"                  },
@@ -191,13 +204,13 @@ int parser(char *cmd)
 int cbf_boot_logo(int argc, char *argv[])
 {
     CONSOLE_SPLIT;
-    printf("+=====================================+\r\n");
-    printf("|,------.   ,--.             ,--.     |\r\n");
-    printf("||  .---'   `--'    ,---.    |  ,---. |\r\n");
-    printf("||  `--,    ,--.   (  .-'    |  .-.  ||\r\n");
-    printf("||  |`      |  |   .-'  `)   |  | |  ||\r\n");
-    printf("|`--'       `--'   `----'    `--' `--'|\r\n");
-    printf("+=====================================+\r\n");
+    printf("+==========================================================+\r\n");
+    printf("|,------.   ,--.             ,--.                          |\r\n");
+    printf("||  .---'   `--'    ,---.    |  ,---.                      |\r\n");
+    printf("||  `--,    ,--.   (  .-'    |  .-.  |                     |\r\n");
+    printf("||  |`      |  |   .-'  `)   |  | |  |   App V1.0          |\r\n");
+    printf("|`--'       `--'   `----'    `--' `--'   %s       |\r\n", __DATE__);
+    printf("+==========================================================+\r\n");
     CONSOLE_SPLIT;
     printf(" $Fish >> ");
     return 0;
@@ -205,7 +218,6 @@ int cbf_boot_logo(int argc, char *argv[])
 
 int cbf_sn(int argc, char *argv[])
 {
-
 #if LEGACY
     printf("SN : %s\r\n", (char *)tag->fw_sn);
 #endif
@@ -242,15 +254,22 @@ int cbf_test(int argc, char *argv[])
 
 int cbf_xmodem(int argc, char *argv[])
 {
-    #if BOOTLOADER
+#if BOOT_MODE
     uint32_t x_modem_size = 0;
-    // f/w update using uart polling
-    HAL_NVIC_DisableIRQ(USART2_IRQn);
+    uint32_t flash_ret = 0;
 
-    FLASH_If_Erase(FLASH_BASE_MAIN_APP);
-    
+    // f/w update using uart polling
+    HAL_NVIC_DisableIRQ(LPUART1_IRQn);
+
+    flash_ret = FLASH_If_Erase(APPLICATION_ADDRESS);
+    if (flash_ret == FALSE) {
+        printf("Flash Erase Error\r\n");
+    }
+
     // entering x-modem ...
-    uint8_t ret = XMODEM_Rx((uint32_t*)&x_modem_size, (uint8_t *)FLASH_BASE_MAIN_APP);
+    Xmodem_InitVariable();
+    
+    uint8_t ret = XMODEM_Rx(&x_modem_size, (uint8_t *)APPLICATION_ADDRESS);
     
     HAL_FLASH_Lock();
 
@@ -258,37 +277,31 @@ int cbf_xmodem(int argc, char *argv[])
     CONSOLE_SPLIT;
     if (ret == FALSE) {
         printf("X-Modem Failed\r\n");
-
     } else {
         printf("X-Modem Completed size : %u byte\r\n", (int)x_modem_size);
     }
     CONSOLE_SPLIT;
 
     // resetting uart isr
-    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(USART2_IRQn);
-    #else
+    HAL_NVIC_SetPriority(LPUART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(LPUART1_IRQn);
+#else
     CONSOLE_SPLIT;
-    printf("System is now entering the bootloader after reboot ... \r\n");
-    CONSOLE_SPLIT;
-    
+    printf("You should update f/w in the boot mode.\r\nboot mode is being entered... \r\n");
+    CONSOLE_SPLIT;    
+#endif
     HAL_NVIC_SystemReset();
-    #endif
     return 0;
 }
 
 static uint8_t check_memory_range(uint32_t address)
 {
-#if LEGACY
     if ( ((address >= (uint32_t )FLASH_RANGE_START)        && (address <= (uint32_t )FLASH_RANGE_END)) ||
          ((address >= (uint32_t )ADDR_INTERNAL_SRAM_START) && (address <= (uint32_t )ADDR_INTERNAL_SRAM_END))) {
         return TRUE;
     } else {
         return FALSE;
     }
-#else
-    return FALSE;
-#endif
 }
 
 #define LINE				4
@@ -298,7 +311,6 @@ static uint8_t check_memory_range(uint32_t address)
 #define ASCII_CHAR_DUMP     0
 int cbf_dump(int argc, char *argv[])
 {
-#if LEGACY
     uint32_t size  = atoi(argv[2]);
     uint32_t *addr = (uint32_t *) strtol(argv[1], NULL, 16);
     uint32_t is_range_ok = (uint32_t)addr;
@@ -311,8 +323,10 @@ int cbf_dump(int argc, char *argv[])
         printf("Base Addrr // dump data ... \n");
         CONSOLE_SPLIT;
     } else {
-        printf("Flash Range is 0x%08lx ~ 0x%08lx\r\n", FLASH_RANGE_START, FLASH_RANGE_END);
-        printf("SRAM  Range is 0x%08lx ~ 0x%08lx\r\n", ADDR_INTERNAL_SRAM_START, ADDR_INTERNAL_SRAM_END);
+        printf("Command Ex is ""dump [Address] [ReadSize Byte] ->""");
+        printf("dump 128 0x08010000\r\n");
+        printf("Flash Range is 0x%08lx ~ 0x%08lx\r\n", (long)FLASH_RANGE_START, (long)FLASH_RANGE_END);
+        printf("SRAM  Range is 0x%08lx ~ 0x%08lx\r\n", (long)ADDR_INTERNAL_SRAM_START, (long)ADDR_INTERNAL_SRAM_END);
         return FALSE;
     }
 
@@ -335,60 +349,61 @@ int cbf_dump(int argc, char *argv[])
             printf("0x%08lx : ", (uint32_t)addr);
         }
     }
-#endif
     printf("\r\n");
     return 0;
 }
 
 int cbf_flash_test(int argc, char *argv[])
 {
-#if LEGACY
     volatile uint32_t *flash_addr = (volatile uint32_t *) strtol(argv[1], NULL, 16);
     uint32_t addr = (uint32_t)flash_addr;
-    uint32_t data = atoi(argv[2]);
+    uint64_t data = atoi(argv[2]);
     if (check_memory_range(addr) == FALSE) {
+        printf("Command is ""flash_test [Address] [Data]\r\n");
         printf("Flash Range is 0x%08lx ~ 0x%08lx\r\n", FLASH_RANGE_START, FLASH_RANGE_END);
         return FALSE;
     }
 
-    #if 0
-    if (HAL_FLASH_Unlock() != HAL_OK) {
-        printf("Flash Unlcok failed\r\n");
-        return 0;
+    printf("Before : Address 0x%08lx : WR Data : 0x%08lx\r\n", (long)addr, (long)data);
+
+    BOOL_e ret = FLASH_If_Erase(addr);
+#if 0    
+    if (ret != TRUE) {
+        printf("Flash Test Error\r\n");
     }
-
-    FLASH_If_Init();
-    #else
-    FLASH_If_Erase(addr);
-    #endif
-
-    #if 1
-    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, (uint32_t)flash_addr, data);
-    #else
-    *flash_addr = data;
-    #endif
-
-    HAL_FLASH_Lock();
-    
-    printf("0x%08lx - 0x%08lx\r\n", (uint32_t)flash_addr, (uint32_t)*flash_addr);
+#else
+    UNUSED(ret);
 #endif
+
+    HAL_FLASH_Unlock();
+    ret = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, (uint32_t)flash_addr, (uint64_t)data);
+    HAL_FLASH_Lock();
+
+#if 0   
+    if (ret != TRUE) {
+        printf("Flash Test Error\r\n");
+    } 
+#endif
+
+    printf("Result : 0x%08lx - 0x%08lx\r\n", (uint32_t)flash_addr, (uint32_t)*flash_addr);
     return 0;
 }
 
 #define VCCTOR_TABLE_OFFSET     4
 int cbf_app_fw_jump(int argc, char *argv[])
 {
-    #if LEGACY
-    printf("Start...\r\n");
+    printf("System Start...\r\n");
+
+    __disable_irq();
+    
     pFunction Jump_To_Application;
 
-    volatile uint32_t JumpAddress = *(__IO uint32_t*) (FLASH_BASE_MAIN_APP + VCCTOR_TABLE_OFFSET);
+    volatile uint32_t JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + VCCTOR_TABLE_OFFSET);
     /* Jump to user application */
     Jump_To_Application = (pFunction) JumpAddress;
     /* Initialize user application's Stack Pointer */
-    __set_MSP(*(__IO uint32_t*) FLASH_BASE_MAIN_APP);
+    __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
     Jump_To_Application(); 
-    #endif
     return 0;
 }
 
@@ -413,6 +428,8 @@ int cbf_test_assert(int argc, char *argv[])
 	int ret = atoi(argv[1]);
     assert_param(ret);
 	#endif
+
+    //printf("sizeof(uint32_t) %d, sizeof(uint64_t) %d \r\n", sizeof(uint32_t), sizeof(uint64_t));
     return 0;
 }
 

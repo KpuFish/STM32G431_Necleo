@@ -918,7 +918,7 @@ typedef struct
   * @{
   */
 
-#define FLASH_BASE            (0x08000000UL) /*!< FLASH (up to 128 kB) base address */
+#define FLASH_BASE            (0x08011000UL) /*!< FLASH (up to 128 kB) base address */
 #define SRAM1_BASE            (0x20000000UL) /*!< SRAM1(up to 16 KB) base address */
 #define SRAM2_BASE            (0x20004000UL) /*!< SRAM2(6 KB) base address */
 #define CCMSRAM_BASE          (0x10000000UL) /*!< CCMSRAM(10 KB) base address */

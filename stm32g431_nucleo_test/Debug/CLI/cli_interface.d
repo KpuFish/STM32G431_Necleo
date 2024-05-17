@@ -37,7 +37,16 @@ CLI/cli_interface.o: ../CLI/cli_interface.c ../Core/Inc/usart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../CLI/cli_interface.h
+ ../CLI/cli_interface.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/flash_if.h \
+ ../Core/Inc/main.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/xmodem.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/common.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/flash_if.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/ymodem.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/menu.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/xmodem.h \
+ C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/ymodem.h
 ../Core/Inc/usart.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
@@ -79,3 +88,12 @@ CLI/cli_interface.o: ../CLI/cli_interface.c ../Core/Inc/usart.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
 ../CLI/cli_interface.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/flash_if.h:
+../Core/Inc/main.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/xmodem.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/common.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/flash_if.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/ymodem.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/menu.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/xmodem.h:
+C:/Users/USER/Downloads/240509_ST_Advanced_Tranning/stm32g431_nucleo/stm32g431_nucleo_test/Boot/ymodem.h:

@@ -29,7 +29,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "cli_interface.h"
+#include "flash_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,13 +95,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+#ifdef _USE_APP_
   MX_DMA_Init();
   MX_ADC1_Init();
   MX_I2C1_Init();
-  MX_LPUART1_UART_Init();
   MX_SPI1_Init();
   MX_DAC1_Init();
+#endif
+  MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  CLI_Init();
 
   /* USER CODE END 2 */
 

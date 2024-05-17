@@ -1,0 +1,2 @@
+../Core/Src/app_freertos.c:67:6:MX_FREERTOS_Init	40	static
+../Core/Src/app_freertos.c:107:6:CLI_Task	16	static
