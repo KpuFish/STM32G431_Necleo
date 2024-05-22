@@ -1,4 +1,0 @@
-../Boot/common.c:42:6:Int2Str	32	static
-../Boot/common.c:70:10:Str2Int	32	static
-../Boot/common.c:144:6:Serial_PutString	24	static
-../Boot/common.c:160:19:Serial_PutByte	16	static

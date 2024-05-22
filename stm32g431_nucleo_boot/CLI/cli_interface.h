@@ -138,6 +138,7 @@ int cbf_help(int argc, char *argv[]);
 int cbf_reset(int argc, char *argv[]);
 int cbf_test(int argc, char *argv[]);
 int cbf_xmodem(int argc, char *argv[]);
+int cbf_ymodem(int argc, char *argv[]);
 int cbf_dump(int argc, char *argv[]);
 int cbf_flash_test(int argc, char *argv[]);
 int cbf_app_fw_jump(int argc, char *argv[]);

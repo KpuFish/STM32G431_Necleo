@@ -4,7 +4,6 @@
 #include "flash_if.h"
 #include "xmodem.h"
 #include "ymodem.h"
-#include "menu.h"
 
 
 
@@ -43,14 +42,6 @@ DEBUG_VIEW_t view;
 
 char gRx_cmd_repeat[UART_BUF_MAX] = { 0, };
 
-//static char *last_command
-/* -------------------------
- * CLI LIST
- * -------------------------
- * (1) - Register here CallBack Function that you want to be added
- * (2) - Define callback function
- * (3) - Fill in the callback function
- */
 const CMD_LIST cmd_list[] =
 {
     {"?"            , cbf_help             , "Show All Command"                 }, 
@@ -58,7 +49,8 @@ const CMD_LIST cmd_list[] =
     {"MODEL?"       , cbf_boot_logo        , "Check Model Info"                 },
     {"SN?"          , cbf_sn               , "Check SN Info"                    },
     {"TEST"         , cbf_test             , "Test CLI Arguments"               },
-    {"X"            , cbf_xmodem           , "F/W Download"                     },
+    {"X"            , cbf_xmodem           , "F/W Download using x-modem"       },
+    {"Y"            , cbf_ymodem           , "F/W Download using y-modem"       },
     {"DUMP"         , cbf_dump             , "Dump Memory"                      },
     {"FLASH_TEST"   , cbf_flash_test       , "Test Flash WR"                    },
 #if BOOT_MODE
@@ -66,10 +58,12 @@ const CMD_LIST cmd_list[] =
 #endif
     {"TAG"          , cbf_tag              , "Check Tag Info"                   },
     {"ASSERT"       , cbf_test_assert      , "Test Assert"                      },
+#if LEGACY
     {"EVENT?"       , cbf_event_print      , "Print Event Log"                  },
     {"EVENT_TEST"   , cbf_event_test       , "Test Event Log"                   },
     {"EVENT_RESET"  , cbf_event_reset      , "Reset Event Log"                  },
     {"DBG"          , cbf_dbg_view         , "View Dbg Message"                 },
+#endif
 #if _USE_AD9833_
     {"WAVE"         , cbf_ad9888_test      , "AD9833 Waveform Test"             },
 #endif
@@ -220,6 +214,8 @@ int cbf_sn(int argc, char *argv[])
 {
 #if LEGACY
     printf("SN : %s\r\n", (char *)tag->fw_sn);
+#else
+    printf("%s\r\n", __DATE__);
 #endif
     return 0;
 }
@@ -247,7 +243,7 @@ int cbf_test(int argc, char *argv[])
 {
 	printf("argv : %s \r\n", argv[0]);
 	//printf("argc : %d , argv : %s \r\n", argc, argv[1]);
-	printf("TEST \r\n");
+	printf("TEST \r\n");    
 	return 0;
 }
 
@@ -256,7 +252,7 @@ int cbf_xmodem(int argc, char *argv[])
 {
 #if BOOT_MODE
     uint32_t x_modem_size = 0;
-    uint32_t flash_ret = 0;
+    uint32_t flash_ret    = 0;
 
     // f/w update using uart polling
     HAL_NVIC_DisableIRQ(LPUART1_IRQn);
@@ -288,7 +284,50 @@ int cbf_xmodem(int argc, char *argv[])
 #else
     CONSOLE_SPLIT;
     printf("You should update f/w in the boot mode.\r\nboot mode is being entered... \r\n");
-    CONSOLE_SPLIT;    
+    CONSOLE_SPLIT;
+#endif
+    HAL_NVIC_SystemReset();
+    return 0;
+}
+
+int cbf_ymodem(int argc, char *argv[])
+{
+#if BOOT_MODE
+    COM_StatusTypeDef result;
+    uint32_t Size = 0;
+    uint8_t number[11] = { 0, };
+    
+    Ymodem_InitVariable();
+
+    HAL_NVIC_DisableIRQ(LPUART1_IRQn);
+
+    // entering y-modem ...
+    result = Ymodem_Receive(&Size);
+    if (result == COM_OK) {
+        Serial_PutString((uint8_t *)"\n\n\r Programming Completed Successfully!\n\r--------------------------------\r\n Name: ");
+        Serial_PutString((uint8_t *)aFileName);
+        Int2Str(number, Size);
+        Serial_PutString((uint8_t *)"\n\r Size: ");
+        Serial_PutString((uint8_t *)number);
+        Serial_PutString((uint8_t *)" Bytes\r\n");
+        Serial_PutString((uint8_t *)"-------------------\n");
+    } else if (result == COM_LIMIT) {
+        Serial_PutString((uint8_t *)"\n\n\rThe image size is higher than the allowed space memory!\n\r");
+    } else if (result == COM_DATA) {
+        Serial_PutString((uint8_t *)"\n\n\rVerification failed!\n\r");
+    } else if (result == COM_ABORT) {
+        Serial_PutString((uint8_t *)"\r\n\nAborted by user.\n\r");
+    } else {
+        Serial_PutString((uint8_t *)"\n\rFailed to receive the file!\n\r");
+    }
+
+    // resetting uart isr
+    HAL_NVIC_SetPriority(LPUART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(LPUART1_IRQn);
+#else
+    CONSOLE_SPLIT;
+    printf("You should update f/w in the boot mode.\r\nboot mode is being entered... \r\n");
+    CONSOLE_SPLIT;
 #endif
     HAL_NVIC_SystemReset();
     return 0;
@@ -417,6 +456,8 @@ int cbf_tag(int argc, char *argv[])
     printf("FW Version\t\t%s\r\n", tag->fw_version );
     printf("FW Compiled date\t%s\r\n", tag->fw_compile_data);
     printf("FW Compiled time\t%s\r\n", tag->fw_compile_time);
+#else
+    printf(" S M I L E  ~  :) \r\n");
 #endif
     CONSOLE_SPLIT;
     return 0;

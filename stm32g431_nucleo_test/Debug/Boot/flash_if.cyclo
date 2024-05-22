@@ -1,6 +1,0 @@
-../Boot/flash_if.c:117:6:FLASH_If_Init	1
-../Boot/flash_if.c:133:10:FLASH_If_Erase	3
-../Boot/flash_if.c:180:10:FLASH_If_Write	5
-../Boot/flash_if.c:219:10:FLASH_If_GetWriteProtectionStatus	2
-../Boot/flash_if.c:292:17:GetPage	4
-../Boot/flash_if.c:311:19:FLASH_If_WriteProtectionConfig	1

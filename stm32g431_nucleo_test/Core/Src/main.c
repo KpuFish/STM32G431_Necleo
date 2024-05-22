@@ -63,7 +63,7 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+#define _USE_APP_	1
 /* USER CODE END 0 */
 
 /**

@@ -1,7 +1,0 @@
-../Boot/xmodem.c:28:6:Xmodem_InitVariable	1
-../Boot/xmodem.c:36:9:Xmodem_Getchar	2
-../Boot/xmodem.c:50:8:XMODEM_WaitForChar	4
-../Boot/xmodem.c:76:8:XMODEM_GetRecord	12
-../Boot/xmodem.c:165:8:XMODEM_Rx	16
-../Boot/xmodem.c:263:8:XMODEM_SendRecord	5
-../Boot/xmodem.c:301:8:XMODEM_Tx	17

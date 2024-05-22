@@ -12,7 +12,10 @@
 			"stm32g4xx_hal_conf.h": "c",
 			"stm32g4xx_hal_flash.h": "c",
 			"xmodem.h": "c",
-			"flash_if.h": "c"
+			"flash_if.h": "c",
+			"string.h": "c",
+			"common.h": "c",
+			"ymodem.h": "c"
 		}
 	}
 }

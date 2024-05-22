@@ -1,6 +1,5 @@
 "./Boot/common.o"
 "./Boot/flash_if.o"
-"./Boot/menu.o"
 "./Boot/xmodem.o"
 "./Boot/ymodem.o"
 "./CLI/cli_interface.o"

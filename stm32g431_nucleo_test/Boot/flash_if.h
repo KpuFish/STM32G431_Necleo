@@ -301,7 +301,7 @@ enum
 /* Exported functions ------------------------------------------------------- */
 void              FLASH_If_Init(void);
 uint32_t          FLASH_If_Erase(uint32_t StartPage);
-uint32_t          FLASH_If_Write(uint32_t FlashAddress, uint32_t* Data, uint32_t DataLength);
+uint32_t          FLASH_If_Write(uint32_t destination, uint32_t *p_source, uint32_t length);
 uint16_t          FLASH_If_GetWriteProtectionStatus(uint32_t ProcessAddress);
 HAL_StatusTypeDef FLASH_If_WriteProtectionConfig(uint32_t modifier, uint32_t ProcessAddress);
 

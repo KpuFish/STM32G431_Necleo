@@ -4,18 +4,8 @@
 #include "common.h"
 #include "flash_if.h"
 
-//#define X_MODEM_SRAM_ADD        0x10010000
-//#define X_MODEM_SRAM_ADD        0x08020000 //FLASH_BASE_XMODEM
-
 
 #define ChangeState(x, y) (x = y)
-
-
-extern uint8_t   guint8_tPacketNumber;
-extern uint32_t  guint32_tPacketSize;
-extern uint32_t  guint32_tXmodem_Size;
-extern uint8_t   ProgramData[1024];
-extern uint16_t  PacketCnt;
 
 
 // Xmodem Sequence Number Definition
@@ -49,6 +39,9 @@ enum
 #define XMODEM_NAK          0x15    /* Negative acknowledge                     */
 #define XMODEM_CAN          0x18    /* Cancel                                   */
 #define XMODEM_EOT          0x04    /* end of text                              */
+
+#define DOWNLOAD_TIMEOUT    3000
+
 
 // CCITT CRC16 Table
  static const unsigned short crc16tab[256]= 
@@ -89,10 +82,6 @@ enum
 
 
 void Xmodem_InitVariable(void);
-
-uint8_t   GetSeconds_RTC(void);
-
-uint8_t   DebugGetchar(uint8_t *retChar);
 
 BOOL_e XMODEM_WaitForChar(uint8_t *uint8_tCPtr, uint32_t uint32_tProcessTime);
 

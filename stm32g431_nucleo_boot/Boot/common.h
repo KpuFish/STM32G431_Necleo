@@ -37,17 +37,35 @@
 #define IS_09(c)            (((c) >= '0') && ((c) <= '9'))
 #define ISVALIDHEX(c)       (IS_CAP_LETTER(c) || IS_LC_LETTER(c) || IS_09(c))
 #define ISVALIDDEC(c)       IS_09(c)
-#define CONVERTDEC(c)       (c - '0')
 
+#define CONVERTDEC(c)       (c - '0')
 #define CONVERTHEX_ALPHA(c) (IS_CAP_LETTER(c) ? ((c) - 'A'+10) : ((c) - 'a'+10))
 #define CONVERTHEX(c)       (IS_09(c) ? ((c) - '0') : CONVERTHEX_ALPHA(c))
+
+
+
+//---------------------------------------------
+// DBG
+//---------------------------------------------
+#define DBG_LED(x)  do {                                            \
+    HAL_GPIO_TogglePin(NUCLEO431RB_LED_PORT, NUCLEO431RB_LED);      \
+    osDelay(x);                                                     \
+} while (1) ;
+
+#define DBG_P printf
+
+#define DBG_LED_MACRO               0
+
+#define _BUint32_tBIT_TO_64BIT_     1
+
+
 
 /* Exported functions ------------------------------------------------------- */
 void Int2Str(uint8_t *p_str, uint32_t intnum);
 uint32_t Str2Int(uint8_t *inputstr, uint32_t *intnum);
 void Serial_PutString(uint8_t *p_string);
 HAL_StatusTypeDef Serial_PutByte(uint8_t param);
-
+void uart_handle_init(void);
 
 //---------------------------------------------
 // Type definition
@@ -57,7 +75,11 @@ typedef unsigned short U16;
 typedef unsigned int   U32;
 typedef signed int     S32;
 
+/* Private variables ---------------------------------------------------------*/
+typedef  void (*pFunction)(void);
 
+
+extern UART_HandleTypeDef hlpuart1;
 extern UART_HandleTypeDef *uart_handler;
 
 

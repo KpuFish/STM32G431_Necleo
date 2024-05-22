@@ -69,8 +69,8 @@ all: main-build
 main-build: stm32g431_nucleo_test.elf secondary-outputs
 
 # Tool invocations
-stm32g431_nucleo_test.elf stm32g431_nucleo_test.map: $(OBJS) $(USER_OBJS) C:\Users\USER\Downloads\240509_ST_Advanced_Tranning\stm32g431_nucleo\stm32g431_nucleo_test\STM32G431RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "stm32g431_nucleo_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\USER\Downloads\240509_ST_Advanced_Tranning\stm32g431_nucleo\stm32g431_nucleo_test\STM32G431RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32g431_nucleo_test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+stm32g431_nucleo_test.elf stm32g431_nucleo_test.map: $(OBJS) $(USER_OBJS) C:\Users\USER\Downloads\240509_ST_Advanced_Tranning\stm32g431_nucleo_test\STM32G431RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "stm32g431_nucleo_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\USER\Downloads\240509_ST_Advanced_Tranning\stm32g431_nucleo_test\STM32G431RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32g431_nucleo_test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -32,6 +32,14 @@
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
+UART_HandleTypeDef *uart_handler = NULL;
+
+void uart_handle_init(void)
+{
+  if (uart_handler == NULL) {
+    uart_handler = &hlpuart1;
+  }
+}
 
 /**
   * @brief  Convert an Integer to a string
@@ -157,7 +165,7 @@ void Serial_PutString(uint8_t *p_string)
   * @param  param The byte to be sent
   * @retval HAL_StatusTypeDef HAL_OK if OK
   */
-HAL_StatusTypeDef Serial_PutByte( uint8_t param )
+HAL_StatusTypeDef Serial_PutByte(uint8_t param)
 {
   /* May be timeouted... */
   if ( uart_handler->gState == HAL_UART_STATE_TIMEOUT )

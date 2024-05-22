@@ -6,22 +6,12 @@
 #include "stdint.h"
 #include "string.h"
 
+
 /* 1K Xmodem  */
 uint8_t  guint8_tPacketNumber;
 uint32_t guint32_tPacketSize;
 uint32_t guint32_tPacketTSize;
 uint32_t guint32_tXmodem_Size;
-
-
-#define DBG_LED_MACRO               0
-
-#define _BUint32_tBIT_TO_64BIT_     1
-
-#define DBG_LED(x)  do {                                            \
-    HAL_GPIO_TogglePin(NUCLEO431RB_LED_PORT, NUCLEO431RB_LED);      \
-    osDelay(x);                                                     \
-} while (1) ;
-
 
 
 
@@ -31,6 +21,8 @@ void Xmodem_InitVariable(void)
     guint8_tPacketNumber  = 0;
     guint32_tPacketSize   = FALSE;
     guint32_tXmodem_Size  = FALSE;
+
+    uart_handle_init();
 }
 
 uint8_t Xmodem_Getchar(uint8_t *retChar)
@@ -132,7 +124,7 @@ BOOL_e XMODEM_GetRecord(uint8_t *uint8_tDestAddress)
         if (idx == 7) {
             idx = 0;
             memcpy((uint64_t *)&flash_data, (uint64_t *)byte_buffer, sizeof(uint64_t));
-            HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, uint8_tDestAddress, flash_data);
+            HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, (uint32_t)uint8_tDestAddress, flash_data);
             uint8_tDestAddress += sizeof(uint64_t);
             flash_data = 0;
         } else {
@@ -274,7 +266,7 @@ BOOL_e XMODEM_SendRecord(uint8_t *uint8_tDataAddress, int32_t int32_tDataLength,
 
     for (uint32_tSize = 0; uint32_tSize < guint32_tPacketSize; ++uint32_tSize)
     {
-        if (DebugGetchar(&uint8_tCPtr))
+        if (XMODEM_GetRecord(&uint8_tCPtr))
         {
             if (uint8_tCPtr == XMODEM_CAN)   return (FALSE);
         }

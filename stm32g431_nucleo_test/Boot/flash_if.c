@@ -170,44 +170,47 @@ uint32_t FLASH_If_Erase(uint32_t StartPage)
 /**
   * @brief  This function writes a data buffer in flash (data are 32-bit aligned).
   * @note   After writing data buffer, the flash content is checked.
-  * @param  FlashAddress: start address for writing data buffer
-  * @param  Data: pointer on data buffer
-  * @param  DataLength: length of data buffer (unit is 32-bit word)   
-  * @retval 0: Data successfully written to Flash memory
+  * @param  destination: start address for target location
+  * @param  p_source: pointer on buffer with data to write
+  * @param  length: length of data buffer (unit is 32-bit word)
+  * @retval uint32_t 0: Data successfully written to Flash memory
   *         1: Error occurred while writing data in Flash memory
   *         2: Written Data in flash memory is different from expected one
   */
-uint32_t FLASH_If_Write(uint32_t FlashAddress, uint32_t* Data ,uint32_t DataLength)
+uint32_t FLASH_If_Write(uint32_t destination, uint32_t *p_source, uint32_t length)
 {
+  uint32_t status = FLASHIF_OK;
   uint32_t i = 0;
- /* Unlock the Flash to enable the flash control register access *************/ 
+
   HAL_FLASH_Unlock();
 
-  for (i = 0; (i < DataLength) && (FlashAddress <= (USER_FLASH_END_ADDRESS-32)); i+=8)
-  {
-    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
-       be done by word */ 
-    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, FlashAddress, ((uint32_t)(Data+i))) == HAL_OK)
-    {
-     /* Check the written value */
-      if (*(uint32_t*)FlashAddress != *(uint32_t*)(Data+i))
-      {
-        /* Flash content doesn't match SRAM content */
-        return(FLASHIF_WRITINGCTRL_ERROR);
-      }
-      /* Increment FLASH destination address */
-      FlashAddress += 32;
-    }
-    else
-    {
-      /* Error occurred while writing data in Flash memory */
-      return (FLASHIF_WRITING_ERROR);
-    }
-  }
+  for (i = 0; (i < length/2) && (destination <= (USER_FLASH_END_ADDRESS-8)); i++)
+   {
+     /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
+        be done by word */
+     if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, destination, *((uint64_t *)(p_source+2*i))) == HAL_OK)
+     {
+      /* Check the written value */
+       if (*(uint64_t *)destination != *(uint64_t *)(p_source + 2 * i))
+       {
+         /* Flash content doesn't match SRAM content */
+         status = FLASHIF_WRITINGCTRL_ERROR;
+         break;
+       }
+       /* Increment FLASH destination address */
+       destination += sizeof(uint64_t);
+     }
+     else
+     {
+       /* Error occurred while writing data in Flash memory */
+       status = FLASHIF_WRITING_ERROR;
+       break;
+     }
+   }
 
   HAL_FLASH_Lock();
 
-  return (FLASHIF_OK);
+  return status;
 }
 
 /**

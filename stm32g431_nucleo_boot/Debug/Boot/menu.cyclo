@@ -1,4 +1,0 @@
-../Drivers/CMSIS/Include/core_cm4.h:1933:34:__NVIC_SystemReset	1
-../Boot/menu.c:66:6:SerialDownload	2
-../Boot/menu.c:95:6:SerialUpload	3
-../Boot/menu.c:123:6:Main_Menu	8
