@@ -4,5 +4,7 @@
 
 ![st](https://github.com/KpuFish/STM32G4-ST_Official_Seminar/assets/43401975/330da457-ee54-4d88-8633-5c3d93479ed7)
 
-![tera](https://github.com/KpuFish/STM32G431_Necleo/assets/43401975/08f5427f-535f-448a-a734-b04f3c6cd6ef)
+![ymodem](https://github.com/KpuFish/STM32G431_Necleo/assets/43401975/c3b7a2f1-c112-412a-b4ea-6eb81b219141)
+
+![ymodem2](https://github.com/KpuFish/STM32G431_Necleo/assets/43401975/f8be7802-20bb-4fde-84c1-eba5b09160ee)
 
